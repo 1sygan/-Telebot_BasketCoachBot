@@ -147,7 +147,7 @@ async def bot_message(message: types.Message):
                     await bot.send_message(message.from_user.id, "Для этого нужно преобрести подписку")
             elif message.text == "Найти видео на YouTube":
                 if db.get_sub_status(message.from_user.id):
-                    await bot.send_message(message.from_user.id, "Что мне искать на YouTube?\nВведите текст",)
+                    await bot.send_message(message.from_user.id, pars_youtube_text)
                 else:
                     await bot.send_message(message.from_user.id, "Для этого нужно преобрести подписку")
 
@@ -188,21 +188,6 @@ async def bot_message(message: types.Message):
                 else:
                     await bot.send_message(message.from_user.id, "Для этого нужно преобрести подписку")
 
-            # парсер YouTube
-            elif message.text != '   ':
-                if db.get_sub_status(message.from_user.id):
-                    await bot.send_message(message.from_user.id, "Начинаю искать")
-
-                    video_href = "https://www.youtube.com/results?search_query=" + "баскетбол " + message.text
-                    driver.get(video_href)
-                    sleep(2)
-                    videos = driver.find_elements("id", "video-title")
-                    for i in range(len(videos)):
-                        await bot.send_message(message.chat.id, videos[i].get_attribute('href'))
-                        if i == 5:
-                            break
-                else:
-                    await bot.send_message(message.from_user.id, "Для этого нужно преобрести подписку")
 
             elif message.text =="Командные составы NBA":
                 if db.get_sub_status(message.from_user.id):
@@ -223,6 +208,21 @@ async def bot_message(message: types.Message):
                     playerPosition = row.find("div", class_="player-position").text
                     message_to_user = f'Имя игрока: {playerName.replace("  ", "")}\nПозиция игрока: {playerPosition.replace("  ", "")}\n'
                     await bot.send_message(message.from_user.id, message_to_user)
+
+            # парсер YouTube
+            elif "Поиск" in message.text:
+                if db.get_sub_status(message.from_user.id):
+                    await bot.send_message(message.from_user.id, "Начинаю искать")
+                    video_href = "https://www.youtube.com/results?search_query=" + "баскетбол " + message.text[5:]
+                    driver.get(video_href)
+                    sleep(2)
+                    videos = driver.find_elements("id", "video-title")
+                    for i in range(len(videos)):
+                        await bot.send_message(message.chat.id, videos[i].get_attribute('href'))
+                        if i == 5:
+                            break
+                else:
+                    await bot.send_message(message.from_user.id, "Для этого нужно преобрести подписку")
             else:
                 if db.get_signup(message.from_user.id) == "setnickname":
                     if(len(message.text)) > 15:
@@ -239,32 +239,37 @@ async def bot_message(message: types.Message):
             await bot.send_message(message.from_user.id, "Для доступа к функционалу бота, подпишитесь на канал",
                                    reply_markup=nav.checkSubMenu)
 
+
 # парсер NBA команд
 @dp.callback_query_handler(text="team_position_nba")
 async def parser(message: types.Message):
+    await bot.delete_message(message.from_user.id, message.message.message_id)
     URL = "https://allbasketball.org/teams/statistics.html"
     sleep(3)
     response = requests.get(url=URL)
     soup = bs(response.text, "lxml")
+    allTeams = ""
     teamData = soup.find("tbody")
     for row in teamData.find_all("tr"):
         teamName = row.find("a", class_="team-name").text
         teamDevision = row.find("div", class_="team-division").text
-        message_to_user = f'Команда: {teamName}\nДевизион: {teamDevision}\n'
-        await bot.send_message(message.from_user.id, message_to_user)
+        allTeams += f'Команда: {teamName}Девизион: {teamDevision}\n'
+    await bot.send_message(message.from_user.id, allTeams)
 
 # парсер ВТБ команд
 @dp.callback_query_handler(text="team_position_vtb")
 async def parser(message: types.Message):
+    await bot.delete_message(message.from_user.id, message.message.message_id)
     URL = "https://news.sportbox.ru/Vidy_sporta/Basketbol/vtb-league/stats"
     sleep(3)
     response = requests.get(url=URL)
     soup = bs(response.text, "lxml")
+    allTeams = ""
     teamData = soup.find("tbody")
     for row in teamData.find_all("td", class_="info table-link"):
-        teamName = row.find("a").text.replace(" ", "")
-        message_to_user = f'Команда: {teamName}\n'
-        await bot.send_message(message.from_user.id, message_to_user)
+        teamName = row.find("a").text.replace("  ", "")
+        allTeams += f'Команда: {teamName}\n\n'
+    await bot.send_message(message.from_user.id, allTeams)
 
 # обработка подписки
 @dp.callback_query_handler(text="subweek")
