@@ -174,17 +174,18 @@ async def bot_message(message: types.Message):
             # парсер игроки дня
             elif message.text == 'Игроки дня по очкам':
                 if db.get_sub_status(message.from_user.id):
-                    await bot.send_message(message.from_user.id, "Начинаю поиск новостей")
+                    await bot.send_message(message.from_user.id, "Начинаю поиск игроков")
                     URL = "https://www.sports.ru/nba/stat/"
                     sleep(3)
                     response = requests.get(url=URL)
                     soup = bs(response.text, 'html.parser')
+                    allPlayer = ""
                     tablePlayer = soup.find("tbody")
                     for row in tablePlayer.find_all("tr"):
                         playerName = row.find("a").text
                         playerTeam = row.find("td", class_="name-td alLeft bordR").text
-                        message_to_user = f'Имя игрока: {playerName.replace("  ", "")}\nКоманда: {playerTeam.replace("  ", "")}\n'
-                        await bot.send_message(message.from_user.id, message_to_user)
+                        allPlayer += f'Имя игрока: {playerName.replace("  ", "")}\nКоманда: {playerTeam.replace("  ", "")}\n'
+                    await bot.send_message(message.from_user.id, allPlayer)
                 else:
                     await bot.send_message(message.from_user.id, "Для этого нужно преобрести подписку")
 
@@ -202,12 +203,13 @@ async def bot_message(message: types.Message):
                 sleep(3)
                 response = requests.get(url=URL)
                 soup = bs(response.text, "lxml")
+                allPlayer = ""
                 teamData = soup.find("tbody")
                 for row in teamData.find_all("div", class_="d-flex align-items-center"):
                     playerName = row.find("a", class_="player-name").text
                     playerPosition = row.find("div", class_="player-position").text
-                    message_to_user = f'Имя игрока: {playerName.replace("  ", "")}\nПозиция игрока: {playerPosition.replace("  ", "")}\n'
-                    await bot.send_message(message.from_user.id, message_to_user)
+                    allPlayer += f'Имя игрока: {playerName.replace("  ", "")}Позиция игрока: {playerPosition.replace("  ", "")}\n'
+                await bot.send_message(message.from_user.id, allPlayer)
 
             # парсер YouTube
             elif "Поиск" in message.text:
