@@ -15,6 +15,7 @@ import functions as fc
 
 TOKEN = "5959698761:AAEWO64P_G_b3geLr8sO6YWDyze941rOtWA"
 YOOTOKEN = "381764678:TEST:46698"
+SBERTOKEN = "401643678:TEST:212e1ece-439a-429a-bd1c-2ca4244d2504"
 CHANNEL_ID = "-1001545665727"
 
 options = webdriver.ChromeOptions()
@@ -89,9 +90,11 @@ async def bot_message(message: types.Message):
                 user_sub = "\nПодписка: " + user_sub
                 await bot.send_message(message.from_user.id, user_nickname + user_sub)
             elif message.text == "Подписка":
-                await bot.send_message(message.from_user.id, sub_text, reply_markup=nav.sub_inline_markup)
-
-
+                await bot.send_message(message.from_user.id, payment_methods_text, reply_markup=nav.sub_inline_markup)
+            elif message.text == "ЮКасса":
+                await bot.send_message(message.from_user.id, sub_text, reply_markup=nav.sub_inline_markup_ykassa)
+            elif message.text == "Сбербанк":
+                await bot.send_message(message.from_user.id, sub_text, reply_markup=nav.sub_inline_markup_sber)
             elif message.text =="Что умеет этот бот?":
                 if db.get_sub_status(message.from_user.id):
                     await bot.send_message(message.from_user.id, functional_sub_text, reply_markup=nav.functionalSubMenu)
@@ -274,25 +277,47 @@ async def parser(message: types.Message):
     await bot.send_message(message.from_user.id, allTeams)
 
 # обработка подписки
-@dp.callback_query_handler(text="subweek")
+# для юкассы
+@dp.callback_query_handler(text="subweekykassa")
 async def sub_week(call: types.CallbackQuery):
     await bot.delete_message(call.from_user.id, call.message.message_id)
     await bot.send_invoice(chat_id=call.from_user.id, title="Оформление подписки", description=sub_text, payload="week_sub",
                            provider_token=YOOTOKEN, currency="RUB", start_parameter="BasketCoachBot", prices=[{"label": "Руб", "amount": 9999 }])
 
 
-@dp.callback_query_handler(text="submonth")
+@dp.callback_query_handler(text="submonthykassa")
 async def sub_month(call: types.CallbackQuery):
     await bot.delete_message(call.from_user.id, call.message.message_id)
     await bot.send_invoice(chat_id=call.from_user.id, title="Оформление подписки", description=sub_text, payload="month_sub",
-                           provider_token=YOOTOKEN, currency="RUB", start_parameter="BasketCoachBot", prices=[{"label": "Руб", "amount": 24999 }])
+                           provider_token=YOOTOKEN, currency="RUB", start_parameter="BasketCoachBot", prices=[{"label": "Руб", "amount": 49999 }])
 
 
-@dp.callback_query_handler(text="subyear")
+@dp.callback_query_handler(text="subyearykassa")
 async def sub_year(call: types.CallbackQuery):
     await bot.delete_message(call.from_user.id, call.message.message_id)
     await bot.send_invoice(chat_id=call.from_user.id, title="Оформление подписки", description=sub_text, payload="year_sub",
                            provider_token=YOOTOKEN, currency="RUB", start_parameter="BasketCoachBot", prices=[{"label": "Руб", "amount": 99999 }])
+
+# для сбербанка
+@dp.callback_query_handler(text="subweeksber")
+async def sub_week(call: types.CallbackQuery):
+    await bot.delete_message(call.from_user.id, call.message.message_id)
+    await bot.send_invoice(chat_id=call.from_user.id, title="Оформление подписки", description=sub_text, payload="week_sub",
+                           provider_token=SBERTOKEN, currency="RUB", start_parameter="BasketCoachBot", prices=[{"label": "Руб", "amount": 9999 }])
+
+
+@dp.callback_query_handler(text="submonthsber")
+async def sub_month(call: types.CallbackQuery):
+    await bot.delete_message(call.from_user.id, call.message.message_id)
+    await bot.send_invoice(chat_id=call.from_user.id, title="Оформление подписки", description=sub_text, payload="month_sub",
+                           provider_token=SBERTOKEN, currency="RUB", start_parameter="BasketCoachBot", prices=[{"label": "Руб", "amount": 49999 }])
+
+
+@dp.callback_query_handler(text="subyearsber")
+async def sub_year(call: types.CallbackQuery):
+    await bot.delete_message(call.from_user.id, call.message.message_id)
+    await bot.send_invoice(chat_id=call.from_user.id, title="Оформление подписки", description=sub_text, payload="year_sub",
+                           provider_token=SBERTOKEN, currency="RUB", start_parameter="BasketCoachBot", prices=[{"label": "Руб", "amount": 99999 }])
 
 
 @dp.pre_checkout_query_handler()
