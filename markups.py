@@ -53,10 +53,28 @@ GameElementsMenu = ReplyKeyboardMarkup(resize_keyboard=True, row_width=3)
 GameElementsMenu.add(btnPerevod, btnPivot, btnPerevodSpina, btnPerevodNogi, btnStepBack, btnEuroStep, btnBackFunctionalMenu)
 
 # TODO конпки для оплаты подписки
-sub_inline_markup = InlineKeyboardMarkup(row_width=1)
-btnSubWeek = InlineKeyboardButton(text="Неделя - 149 рублей", callback_data="subweek")
-btnSubMonth = InlineKeyboardButton(text="Месяц - 499 рублей", callback_data="submonth")
-btnSubYear = InlineKeyboardButton(text="Год - 999 рублей", callback_data="subyear")
-sub_inline_markup.insert(btnSubWeek)
-sub_inline_markup.insert(btnSubMonth)
-sub_inline_markup.insert(btnSubYear)
+sub_inline_markup = ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
+btnSubSber = KeyboardButton(text="Сбербанк")
+btnSubYKassa = KeyboardButton(text="ЮКасса")
+sub_inline_markup.add(btnSubSber, btnSubYKassa, btnBack)
+
+# TODO конпки для оплаты подписки YKassa
+btnSubWeekYKassa = InlineKeyboardButton(text="Неделя - 99 рублей", callback_data="subweekykassa")
+btnSubMonthYKassa = InlineKeyboardButton(text="Месяц - 499 рублей", callback_data="submonthykassa")
+btnSubYearYKassa = InlineKeyboardButton(text="Год - 999 рублей", callback_data="subyearykassa")
+sub_inline_markup_ykassa = InlineKeyboardMarkup(row_width=1)
+sub_inline_markup_ykassa.insert(btnSubWeekYKassa)
+sub_inline_markup_ykassa.insert(btnSubMonthYKassa)
+sub_inline_markup_ykassa.insert(btnSubYearYKassa)
+
+# TODO конпки для оплаты подписки Сбербанк
+btnSubWeekSber = InlineKeyboardButton(text="Неделя - 99 рублей", callback_data="subweeksber")
+btnSubMonthSber = InlineKeyboardButton(text="Месяц - 499 рублей", callback_data="submonthsber")
+btnSubYearSber = InlineKeyboardButton(text="Год - 999 рублей", callback_data="subyearsber")
+sub_inline_markup_sber = InlineKeyboardMarkup(row_width=1)
+sub_inline_markup_sber.insert(btnSubWeekSber)
+sub_inline_markup_sber.insert(btnSubMonthSber)
+sub_inline_markup_sber.insert(btnSubYearSber)
+
+
+
